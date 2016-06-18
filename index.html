@@ -1,0 +1,111 @@
+<html>
+<head>
+	<title>ToDoApp</title>
+	<script src="angular.min.js"></script>
+	<style>
+
+		h1{
+			text-align:center;
+		}
+		table, th , td  {
+  			border: 1px solid grey;
+  			border-collapse: collapse;
+  			padding: 5px;
+		}
+		td {
+			width:700px;
+			font-size:22px;
+		}
+		table {
+			margin-left:auto;
+			margin-right:auto;
+		}	
+		table tr:nth-child(odd) {
+  			background-color: #fafafa;
+		}
+		table tr:nth-child(even) {
+  			background-color: #d3d3d3;
+		}
+		table tr:first-child{
+			background-color:#fff;
+		}
+		#enter-todo {
+			width:100%;
+			height:50px;
+			font-size:30px;
+			float:left;
+		}
+		.fin-true{
+			text-decoration: line-through;
+			color:gray;
+		}
+		.fin-false {
+			text-decoration: none;
+			color:black;
+		}
+		#trash {
+			float:right;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>To Do List</h1>
+
+	<div ng-app="ToDoList" ng-controller="ctrl">
+	<table>
+		<tr>
+			<td>
+			<form ng-keyup="$event.keyCode == 13 && submit()">
+				<input id="enter-todo" placeholder="Enter todo" type="text" ng-model="todoitem">
+			</form>
+			</td>
+		</tr>
+		<tr ng-repeat="x in todoitems">
+			<td>
+				<input type="checkbox" ng-model="x.completed">
+
+				<span class="fin-{{x.completed}}" ng-hide="editmode">{{($index+1) + ") " + x.title }}</span>
+
+				<form ng-show="editmode">
+					<input type="text" ng-bind="x.title">
+					<input type="button" ng-click="disableEdit">
+				</form>
+
+				<input type="image" src="trash.png" widht="20px" height="20px" id="trash" ng-click="delete($index)">
+			</td>
+		</tr>
+	</table>
+	</div>
+
+	<script>
+		var app = angular.module("ToDoList", []);
+		app.controller("ctrl", function($scope){
+			$scope.editmode = false
+			$scope.todoitems = [
+				{title:"make a ToDo item", completed:false},
+				{title:"complete a ToDo item", completed:false}
+				];
+			$scope.submit = function() {
+				if($scope.todoitem){
+					$scope.todoitems.push({title:$scope.todoitem, completed:false});
+					$scope.todoitem = "";
+				}
+			}
+			$scope.delete = function(index) {
+				if(index > -1){
+					$scope.todoitems.splice(index, 1)
+				}
+			}
+			$scope.enableEdit = function() {
+				$scope.editmode = true;
+			}
+			$scope.disableEdit = function(){
+				$scope.editmode = false;
+			}
+		});
+	</script>
+
+</body>
+
+</html>
