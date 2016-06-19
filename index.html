@@ -46,6 +46,9 @@
 		#trash {
 			float:right;
 		}
+		a{
+			text-decoration: none;
+		}
 	</style>
 </head>
 
@@ -63,16 +66,23 @@
 		</tr>
 		<tr ng-repeat="x in todoitems">
 			<td>
-				<input type="checkbox" ng-model="x.completed">
+				<!--Normal Mode-->
+				<form ng-hide="editmode">
+					<!--finished box-->
+					<input type="checkbox" ng-model="x.completed">
 
-				<span class="fin-{{x.completed}}" ng-hide="editmode">{{($index+1) + ") " + x.title }}</span>
+					<!--text-->
+					<span class="fin-{{x.completed}}" ng-click="editmode = true">{{($index+1) + ") " + x.title }}</span>
 
-				<form ng-show="editmode">
-					<input type="text" ng-bind="x.title">
-					<input type="button" ng-click="disableEdit">
+					<!--trashcan-->
+					<input type="image" src="trash.png" widht="20px" height="20px" id="trash" ng-click="delete($index)">
 				</form>
 
-				<input type="image" src="trash.png" widht="20px" height="20px" id="trash" ng-click="delete($index)">
+				<!--Edit Mode-->
+				<form ng-show="editmode">
+					<input type="text" value="x.title" ng-model="x.title">
+					<input type="button" ng-click="editmode = false" value="submit">
+				</form>
 			</td>
 		</tr>
 	</table>
@@ -81,7 +91,7 @@
 	<script>
 		var app = angular.module("ToDoList", []);
 		app.controller("ctrl", function($scope){
-			$scope.editmode = false
+			$scope.editmode = false;
 			$scope.todoitems = [
 				{title:"make a ToDo item", completed:false},
 				{title:"complete a ToDo item", completed:false}
@@ -96,12 +106,6 @@
 				if(index > -1){
 					$scope.todoitems.splice(index, 1)
 				}
-			}
-			$scope.enableEdit = function() {
-				$scope.editmode = true;
-			}
-			$scope.disableEdit = function(){
-				$scope.editmode = false;
 			}
 		});
 	</script>
