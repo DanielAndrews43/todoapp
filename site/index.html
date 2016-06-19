@@ -1,0 +1,154 @@
+<html>
+<head>
+	<title>ToDoApp</title>
+	<script src="angular.min.js"></script>
+	<style>
+
+		h1{
+			text-align:center;
+		}
+		table, th , td  {
+  			border: 1px solid grey;
+  			border-collapse: collapse;
+  			padding: 5px;
+		}
+		td {
+			width:700px;
+			font-size:22px;
+		}
+		table {
+			margin-left:auto;
+			margin-right:auto;
+		}	
+		table tr:nth-child(odd) {
+  			background-color: #fafafa;
+		}
+		table tr:nth-child(even) {
+  			background-color: #d3d3d3;
+		}
+		table tr:first-child{
+			background-color:#fff;
+		}
+		#enter-todo {
+			width:100%;
+			height:50px;
+			font-size:30px;
+			float:left;
+		}
+		.fin-true{
+			text-decoration: line-through;
+			color:gray;
+		}
+		.fin-false {
+			text-decoration: none;
+			color:black;
+		}
+		#trash {
+			float:right;
+		}
+		a{
+			text-decoration: none;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>To Do List</h1>
+
+	<div ng-app="ToDoList" ng-controller="ctrl">
+	<table>
+		<tr>
+			<td>
+			<form ng-keyup="$event.keyCode == 13 && submit()">
+				<input id="enter-todo" placeholder="Enter todo" type="text" ng-model="todotext.text">
+			</form>
+			</td>
+		</tr>
+		<tr ng-repeat="x in todos">
+			<td>
+				<!--Normal Mode-->
+				<form ng-hide="editmode">
+					<!--finished box-->
+					<input type="checkbox" ng-model="x.done">
+
+					<!--text-->
+					<span class="fin-{{x.done}}" ng-click="editmode = true" ng-model="x.done">{{($index+1) + ") " + x.text }}</span>
+
+					<!--trashcan-->
+					<input type="image" src="trash.png" widht="20px" height="20px" id="trash" ng-click="delete(x._id)">
+				</form>
+
+				<!--Edit Mode-->
+				<form ng-show="editmode">
+					<input type="text" value="x.title" ng-model="x.title">
+					<input type="button" ng-click="editmode = false" value="submit">
+				</form>
+			</td>
+		</tr>
+	</table>
+	</div>
+
+	<script>
+		var app = angular.module("ToDoList", []);
+		app.controller("ctrl", function($scope, $http){
+			$scope.editmode = false;
+
+			$scope.todotext = {};
+
+			$http.get('/api/todos')
+				.success(function(data) {
+					$scope.todos = data;
+					console.log(data);
+				})
+				.error(function(data){
+					console.log("error: " + data);
+				});
+
+			$scope.submit = function(){
+				//$scope.update($scope.todos);
+				$http.post('/api/todos', $scope.todotext)
+				.success(function(data){
+					$scope.todotext = {};
+					$scope.todos = data;
+					console.log(data);
+				})
+				.error(function(data){
+					console.log("error: " + data);
+				});
+			};
+
+/**
+			$scope.update = function($todolist){
+				var llength = $todolist.length;
+				var oldids = [];
+				for(var i = 0; i < llength; i++){
+					oldids.push($todolist[i].id);
+					$http.post('/api/todos', $todolist[i]);
+
+				}
+				for(var i = 0; i < oldids.length; i++){
+					$http.delete('/api/todos/' + oldids[i]);
+				}
+			};**/
+
+			$scope.delete = function(id){
+				//$scope.update($scope.todos);
+				$http.delete('/api/todos/' + id)
+					.success(function(data){
+						$scope.todos = data;
+						console.log(data);
+					})
+					.error(function(data){
+						console.log("error: " + data);
+					});
+			};
+
+			$scope.enableEdit = function() {
+				editmode = true;
+			}
+		});
+	</script>
+
+</body>
+
+</html>
