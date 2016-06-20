@@ -69,10 +69,10 @@
 				<!--Normal Mode-->
 				<form ng-hide="editmode">
 					<!--finished box-->
-					<input type="checkbox" ng-model="x.done">
+					<input type="checkbox" ng-model="x.done" ng-click="update(x)">
 
 					<!--text-->
-					<span class="fin-{{x.done}}" ng-click="editmode = true" ng-model="x.done">{{($index+1) + ") " + x.text }}</span>
+					<span class="fin-{{x.done}}" ng-click="editmode = true">{{($index+1) + ") " + x.text }}</span>
 
 					<!--trashcan-->
 					<input type="image" src="trash.png" widht="20px" height="20px" id="trash" ng-click="delete(x._id)">
@@ -80,8 +80,8 @@
 
 				<!--Edit Mode-->
 				<form ng-show="editmode">
-					<input type="text" value="x.title" ng-model="x.title">
-					<input type="button" ng-click="editmode = false" value="submit">
+					<input type="text" ng-model="x.text">
+					<input type="button" ng-click="editmode = false && update(x)" value="submit">
 				</form>
 			</td>
 		</tr>
@@ -117,19 +117,29 @@
 				});
 			};
 
-/**
-			$scope.update = function($todolist){
-				var llength = $todolist.length;
-				var oldids = [];
-				for(var i = 0; i < llength; i++){
-					oldids.push($todolist[i].id);
-					$http.post('/api/todos', $todolist[i]);
+			$scope.update = function(item) {
+				$http.post('/api/todos/' + item._id, {
+					done: item.done,
+					text: item.text
+				}).success(function(data) {
+					$scope.todos = data;
+				}).error(function(err) {
+					console.error('error:', err);
+				})
+			};
 
-				}
-				for(var i = 0; i < oldids.length; i++){
-					$http.delete('/api/todos/' + oldids[i]);
-				}
-			};**/
+			// $scope.update = function($todolist){
+			// 	var llength = $todolist.length;
+			// 	var oldids = [];
+			// 	for(var i = 0; i < llength; i++){
+			// 		oldids.push($todolist[i].id);
+			// 		$http.post('/api/todos', $todolist[i]);
+
+			// 	}
+			// 	for(var i = 0; i < oldids.length; i++){
+			// 		$http.delete('/api/todos/' + oldids[i]);
+			// 	}
+			// };
 
 			$scope.delete = function(id){
 				//$scope.update($scope.todos);

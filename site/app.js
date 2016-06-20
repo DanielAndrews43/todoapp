@@ -50,6 +50,21 @@ app.post('/api/todos', function(req, res){
 	});
 });
 
+app.post('/api/todos/:todo_id', function(req, res) {
+	Todo.findOne({ _id: req.params.todo_id }).exec().then(function(item) {
+		var done = typeof req.body.done === 'boolean' ? req.body.done : item.done;
+		var text = req.body.text || item.text;
+
+		return item.update({ done: done, text: text }).exec();
+	}).then(function() {
+		return Todo.find({}).exec();
+	}).then(function(todos) {
+		res.json(todos);
+	}).catch(function(err) {
+		res.send(err);
+	});
+});
+
 app.delete('/api/todos/:todo_id', function(req, res){
 	Todo.remove({
 		_id : req.params.todo_id
